@@ -1,1 +1,1 @@
-# gitops-lightspeed-knowledge
+This is a Repo for creating a container image to add context of argocd, argocd-operator, gitops-operator to Lightspeed.
