@@ -21,8 +21,15 @@ command -v asciidoctor >/dev/null || {
 }
 find "$IN" -type f -name "*.adoc" | while IFS= read -r f; do
   out="${f#$IN/}"
+  # repo root = first path segment
+  repo_root="$IN/${out%%/*}"
   out="${out%.adoc}.md"
   mkdir -p "$(dirname "$OUT/$out")"
-  asciidoctor -b docbook -o - "$f" | pandoc -f docbook -t markdown_strict  -o "$OUT/$out"
+
+  asciidoctor \
+    -B "$repo_root" \
+    -b docbook \
+    "$f" -o - | \
+  pandoc -f docbook -t markdown_strict  -o "$OUT/$out"
 done
 echo "Converted .adoc files"
