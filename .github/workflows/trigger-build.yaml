@@ -62,6 +62,14 @@ jobs:
         run: |
           IMAGE="${{ secrets.QUAY_REPOSITORY }}:${{ inputs.TARGET_TAG }}"
 
+          echo "Workspace contents:"
+          ls -la
+          ls -la vector
+
           podman load < vector/argocd-byok-image.tar
+
+          echo "Podman images after load:"
+          podman images
+
           podman tag localhost/argocd-byok-image:latest $IMAGE
           podman push "$IMAGE"
