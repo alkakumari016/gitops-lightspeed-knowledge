@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
-set -x
-
 BYOK_TOOL_IMAGE=registry.redhat.io/openshift-lightspeed-tech-preview/lightspeed-rag-tool-rhel9:latest
 #BYOK_TOOL_IMAGE=quay.io/rhn-support-alkumari/byok_tool:0.0.1
-
+mkdir -p vector
 echo "Workspace contents:"
           ls -la
           ls -la vector
