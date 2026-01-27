@@ -39,17 +39,24 @@ jobs:
             pandoc \
             asciidoctor \
             git
-      - name: Run ingestion pipeline
-        run: |
-          chmod +x pipeline.sh
-          ./pipeline.sh
-
       - name: Login to Quay.io
         uses: docker/login-action@v3
         with:
           registry: quai.io
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_PASSWORD }}
+
+      - name: Log in to Red Hat Registry
+        uses: redhat-actions/podman-login@v1
+        with:
+          registry: registry.redhat.io
+          username: ${{ secrets.RH_USERNAME }}
+          password: ${{ secrets.RH_PASSWORD }}
+
+      - name: Run ingestion pipeline
+        run: |
+          chmod +x pipeline.sh
+          ./pipeline.sh
 
       - name: Build and push vector image
         run: |
