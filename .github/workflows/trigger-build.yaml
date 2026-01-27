@@ -1,0 +1,60 @@
+name: Build BYOK Vector Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      TARGET_BRANCH:
+        description: 'Branch to build from (e.g. main)'
+        required: true
+        type: string
+      TARGET_TAG:
+        description: 'Image tag to push (e.g. latest, v0.0.1)'
+        required: true
+        type: string
+
+  workflow_call:
+    inputs:
+      TARGET_BRANCH:
+        required: true
+        type: string
+      TARGET_TAG:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.TARGET_BRANCH }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            podman \
+            pandoc \
+            asciidoctor \
+            git
+      - name: Run ingestion pipeline
+        run: |
+          chmod +x pipeline.sh
+          ./pipeline.sh
+
+      - name: Login to Quay.io
+        uses: podman/login-action@v3
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+
+      - name: Build and push vector image
+        run: |
+          IMAGE="${{ secrets.QUAY_REPOSITORY }}:${{ inputs.TARGET_TAG }}"
+
+          podman load vector/argocd-byok-image.tar
+          podman tag localhost/argocd-byok-image:latest $IMAGE
+          podman push "$IMAGE"
